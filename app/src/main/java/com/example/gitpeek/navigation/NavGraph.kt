@@ -19,7 +19,7 @@ fun AppNavGraph(navController: NavHostController) {
         composable(Screen.Detail.route) { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username")
             if (username != null) {
-                DetailScreen(username)
+                DetailScreen(username,navController)
             }
         }
     }

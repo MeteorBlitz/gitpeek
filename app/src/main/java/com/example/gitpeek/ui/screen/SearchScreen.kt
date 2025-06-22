@@ -1,6 +1,5 @@
 package com.example.gitpeek.ui.screen
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,12 +9,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,6 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.gitpeek.navigation.Screen
+import com.example.gitpeek.ui.common.AppTopBar
 import com.example.gitpeek.ui.mvi.UserIntent
 import com.example.gitpeek.ui.mvi.UserViewModel
 
@@ -44,96 +47,101 @@ fun SearchScreen(
     var username by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "🔍 GitPeek",
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        OutlinedTextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("Enter GitHub username") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Button(
-            onClick = {
-                focusManager.clearFocus()
-                viewModel.onIntent(UserIntent.Search(username))
-            },
-            modifier = Modifier.fillMaxWidth()
+    Scaffold(
+        topBar = { AppTopBar(title = "GitPeek", icon = Icons.Default.Search) }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Search", style = MaterialTheme.typography.titleMedium)
-        }
 
-        Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-        when {
-            state.isLoading -> {
-                CircularProgressIndicator()
+            OutlinedTextField(
+                value = username,
+                onValueChange = { username = it },
+                label = { Text("Enter GitHub username") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Button(
+                onClick = {
+                    focusManager.clearFocus()
+                    viewModel.onIntent(UserIntent.Search(username))
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Search", style = MaterialTheme.typography.titleMedium)
             }
 
-            state.error != null -> {
-                Text(
-                    text = state.error ?: "Unknown error",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+            Spacer(modifier = Modifier.height(32.dp))
 
-            state.user != null -> {
-                val user = state.user!!
+            when {
+                state.isLoading -> {
+                    CircularProgressIndicator()
+                }
 
-                Card(
-                    onClick = {
-                        navController.navigate(Screen.Detail.createRoute(user.login))
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    shape = MaterialTheme.shapes.large,
-                    elevation = CardDefaults.cardElevation(8.dp)
-                ) {
-                    Row(
+                state.error != null -> {
+                    Text(
+                        text = state.error ?: "Unknown error",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                state.user != null -> {
+                    val user = state.user!!
+
+                    Card(
+                        onClick = {
+                            navController.navigate(Screen.Detail.createRoute(user.login))
+                        },
                         modifier = Modifier
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        shape = MaterialTheme.shapes.large,
+                        elevation = CardDefaults.cardElevation(8.dp)
                     ) {
-                        AsyncImage(
-                            model = user.avatarUrl,
-                            contentDescription = "Avatar",
-                            contentScale = ContentScale.Crop,
+                        Row(
                             modifier = Modifier
-                                .size(72.dp)
-                        )
-
-                        Spacer(modifier = Modifier.width(16.dp))
-
-                        Column {
-                            Text(
-                                text = user.name ?: "N/A",
-                                style = MaterialTheme.typography.titleLarge
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            AsyncImage(
+                                model = user.avatarUrl,
+                                contentDescription = "Avatar",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(72.dp)
                             )
-                            Text(
-                                text = "@${user.login}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Text("📍 ${user.location ?: "Unknown"}", style = MaterialTheme.typography.bodySmall)
-                            Text("📦 ${user.publicRepos} Repositories", style = MaterialTheme.typography.bodySmall)
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            Column {
+                                Text(
+                                    text = user.name ?: "N/A",
+                                    style = MaterialTheme.typography.titleLarge
+                                )
+                                Text(
+                                    text = "@${user.login}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    "📍 ${user.location ?: "Unknown"}",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                                Text(
+                                    "📦 ${user.publicRepos} Repositories",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
                         }
                     }
                 }
