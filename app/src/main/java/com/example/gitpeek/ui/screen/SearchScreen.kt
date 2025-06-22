@@ -25,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
@@ -52,9 +51,13 @@ fun SearchScreen(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("GitHub User Search", style = MaterialTheme.typography.titleLarge)
+        Text(
+            text = "🔍 GitPeek",
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.primary
+        )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         OutlinedTextField(
             value = username,
@@ -64,7 +67,7 @@ fun SearchScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Button(
             onClick = {
@@ -73,10 +76,10 @@ fun SearchScreen(
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Search")
+            Text("Search", style = MaterialTheme.typography.titleMedium)
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         when {
             state.isLoading -> {
@@ -86,7 +89,8 @@ fun SearchScreen(
             state.error != null -> {
                 Text(
                     text = state.error ?: "Unknown error",
-                    color = Color.Red
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
@@ -100,7 +104,8 @@ fun SearchScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
-                    elevation = CardDefaults.cardElevation(6.dp)
+                    shape = MaterialTheme.shapes.large,
+                    elevation = CardDefaults.cardElevation(8.dp)
                 ) {
                     Row(
                         modifier = Modifier
@@ -110,14 +115,25 @@ fun SearchScreen(
                         AsyncImage(
                             model = user.avatarUrl,
                             contentDescription = "Avatar",
-                            modifier = Modifier.size(64.dp)
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(72.dp)
                         )
+
                         Spacer(modifier = Modifier.width(16.dp))
+
                         Column {
-                            Text("Name: ${user.name ?: "N/A"}", style = MaterialTheme.typography.titleMedium)
-                            Text("Username: ${user.login}")
-                            Text("Repos: ${user.publicRepos}")
-                            Text("Location: ${user.location ?: "N/A"}")
+                            Text(
+                                text = user.name ?: "N/A",
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            Text(
+                                text = "@${user.login}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text("📍 ${user.location ?: "Unknown"}", style = MaterialTheme.typography.bodySmall)
+                            Text("📦 ${user.publicRepos} Repositories", style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }
@@ -125,3 +141,4 @@ fun SearchScreen(
         }
     }
 }
+
