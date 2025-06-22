@@ -11,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.example.gitpeek.navigation.AppNavGraph
 import com.example.gitpeek.ui.screen.SearchScreen
 import com.example.gitpeek.ui.theme.GitPeekTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,7 +23,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             GitPeekTheme {
-                SearchScreen() // your main Composable
+                val navController = rememberNavController()
+                AppNavGraph(navController)
             }
         }
     }

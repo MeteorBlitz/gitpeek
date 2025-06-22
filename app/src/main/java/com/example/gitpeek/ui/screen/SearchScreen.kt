@@ -2,13 +2,17 @@ package com.example.gitpeek.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -26,12 +30,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.gitpeek.navigation.Screen
 import com.example.gitpeek.ui.mvi.UserIntent
 import com.example.gitpeek.ui.mvi.UserViewModel
 
 @Composable
 fun SearchScreen(
+    navController: NavHostController,
     viewModel: UserViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -85,17 +92,35 @@ fun SearchScreen(
 
             state.user != null -> {
                 val user = state.user!!
-                AsyncImage(
-                    model = user.avatarUrl,
-                    contentDescription = "Avatar",
-                    modifier = Modifier.size(100.dp),
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Name: ${user.name ?: "N/A"}")
-                Text("Username: ${user.login}")
-                Text("Location: ${user.location ?: "N/A"}")
-                Text("Repos: ${user.publicRepos}")
+
+                Card(
+                    onClick = {
+                        navController.navigate(Screen.Detail.createRoute(user.login))
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    elevation = CardDefaults.cardElevation(6.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AsyncImage(
+                            model = user.avatarUrl,
+                            contentDescription = "Avatar",
+                            modifier = Modifier.size(64.dp)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column {
+                            Text("Name: ${user.name ?: "N/A"}", style = MaterialTheme.typography.titleMedium)
+                            Text("Username: ${user.login}")
+                            Text("Repos: ${user.publicRepos}")
+                            Text("Location: ${user.location ?: "N/A"}")
+                        }
+                    }
+                }
             }
         }
     }
